@@ -55,8 +55,9 @@ int main(int argc, char const *argv[])
 		cout << endl << "Something has gone wrong opening the directory!" << endl;
 		exit(1);
 	}
-
-	//Add path by strcat
+	map<string, float> track;
+	float entropy_sum = 0;
+	float max = 0;
 	const char *exe = "/*.exe";
 	const char *dll = "/*.dll";
 	char result1[100];
@@ -66,11 +67,16 @@ int main(int argc, char const *argv[])
 	strcpy(result2, filepath);
 	strcat(result2, dll);
 	vector<string> names = listFiles(result1);
+	int exe_size = names.size();
 	vector<string> names2 = listFiles(result2);
+	int dll_size = names2.size();
 	names.insert(names.end(), names2.begin(), names2.end());
-	/*for (int i = 0; i < names.size(); i++) {
-		cout << names[i]<<endl;
-	}*/
+	int total_size = exe_size + dll_size;
+
+	cout << "Number of .exe files are: " << exe_size << endl;
+	cout << "Number of .dll files are: " << dll_size << endl;
+	cout << "Total files are: " << total_size << endl;
+
 	if (SetCurrentDirectoryA(filepath))
 		cout << "Going to the filepath." << endl;
 	else
@@ -111,9 +117,20 @@ int main(int argc, char const *argv[])
 		}
 		entropy *= -1;
 		cout << "Entropy is: " << entropy << endl;
+		entropy_sum += entropy;
+		if (entropy > max)
+			max = entropy;
+		track[s] = entropy;
 		fclose(file);
 	}
-
+	float avg = entropy_sum / total_size;
+	float cut_off = max * 0.9;
+	cout << "Cut off is: " << cut_off << endl;
+	for (auto val : track) {
+		if (val.second >= cut_off)
+			cout << val.first << ": " << val.second << endl;
+	}
+	cout << "The average entropy of all the files is: " << avg << endl;
 	cin >> i;
 	return 0;
 }
