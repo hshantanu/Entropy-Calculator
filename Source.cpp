@@ -155,6 +155,7 @@ int main(int argc, char const *argv[])
 			min = entropy;
 			
 		track[s] = entropy;
+		cnt++;
 		fclose(file);
 	}
 
