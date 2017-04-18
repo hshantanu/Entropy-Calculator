@@ -2,8 +2,7 @@
 //Shantanu Hirlekar
 //Malware Analysis Mini Project Spring(2017)
 
-//I have referred code from http://rosettacode.org/wiki/Entropy#C.2B.2B 
-//I used this to refer the formula. 
+//I have referred the code to calculate entropy from http://rosettacode.org/wiki/Entropy#C.2B.2B  
 
 #include <iostream>
 #include <string>
@@ -89,13 +88,13 @@ int main(int argc, char const *argv[])
 	const char *filepath;
 	map<string, float> track;
 	float entropy_sum = 0;
-	float max = 0;
+	float max = 0, min = 0;
 	const char *exe = "/*.exe";
 	const char *dll = "/*.dll";
 	char result1[100];
 	char result2[100];
 	
-	//Open the file provided in the command line argument. Else go o the default path. 
+	//Open the file provided in the command line argument. Else go to the default path. 
 	if (argc != 2) {
 		filepath = "C:/WINDOWS/System32/";
 	}
@@ -135,6 +134,7 @@ int main(int argc, char const *argv[])
 	}
 
 	//Open each file and calculate it's entropy.
+	int cnt = 0;
 	for(string s : names){
 		
 		if ((file = fopen(s.c_str(), "rb")) == NULL) {
@@ -147,8 +147,13 @@ int main(int argc, char const *argv[])
 		double entropy = getEntropy(file);
 
 		entropy_sum += entropy;
-		if (entropy > max)
+		if (entropy > max) 
 			max = entropy;
+		if (cnt == 0)
+			min = entropy;
+		else if (entropy < min)
+			min = entropy;
+			
 		track[s] = entropy;
 		fclose(file);
 	}
@@ -158,9 +163,10 @@ int main(int argc, char const *argv[])
 	cout <<endl<< "The average entropy of all the files is: " << avg << endl;
 
 	//Getting the files with entropy in top 10%
-	float cut_off = max * 0.9;
-	getTen(cut_off, track);	
+	float cut_off = (max - min) * 0.9 + min;
+	getTen(cut_off, track);
 	
+	//cin so as to we can see the output.
 	cin >> i;
 	return 0;
 }
